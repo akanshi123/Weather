@@ -128,33 +128,40 @@ const DisplayWeather = () => {
   React.useEffect(() => {
     const fetchData = async () => {
       navigator.geolocation.getCurrentPosition(async (position) => {
-        const { latitude, longitude } = position.coords;
+        // get the current geolocation of the user
+        const { latitude, longitude } = position.coords; // extracts the lat and lon properties from the position.coords object
         const [currentWeather] = await Promise.all([
           fetchCurrentWeather(latitude, longitude),
         ]);
-        setWeatherData(currentWeather);
-        setIsLoading(true);
-      });
+        setWeatherData(currentWeather); // updates the weatherData state variable
+        setIsLoading(true); // updates isLoading state variable
+      }); // ends the callBack function passed to getCuurentPosition
     };
-    fetchData();
-  }, [fetchCurrentWeather]);
+    fetchData(); // Calls the fetchData function to execute it
+  }, [fetchCurrentWeather]); // specify the dependency array that means rerun whenever the function changes
 
   return (
     <MainWrapper>
       <div className="container">
         <div className="searchArea">
-          <input
+          <input //Text input Element
             type="text"
-            placeholder="Enter City Name"
-            value={searchCity}
+            placeholder="Enter A Valid City Name" // Hint
+            value={searchCity} // input value will display the current value of the searchCity
             onChange={(e) => setSearchCity(e.target.value)}
+            // updates the state variable whenever the user types something in the input field
           />
 
           <div className="searchCircle">
-            <AiOutlineSearch className="searchIcon" onClick={handleSearch} />
+            <AiOutlineSearch
+              className="searchIcon"
+              onClick={handleSearch} //When the user clicks on the icon, the handleSearch function will be called
+            />
           </div>
         </div>
-        {weatherData && isLoading ? (
+
+        {weatherData && isLoading ? ( // uses Ternary operator either a weatherData or loading
+          //render Weather data
           <>
             <div className="weatherArea">
               <h1>{weatherData.name}</h1>
@@ -184,6 +191,7 @@ const DisplayWeather = () => {
             </div>
           </>
         ) : (
+          // Render Loading indicator
           <div className="loading">
             <RiLoaderFill className="loadingIcon" />
             <p>Loading</p>
@@ -193,11 +201,11 @@ const DisplayWeather = () => {
 
       {error && (
         <p style={{ color: "red", fontSize: "2rem", fontWeight: "bolder" }}>
-          Invalid city
+          {error}
         </p>
       )}
     </MainWrapper>
   );
 };
-
+// Exports the DisplayWeather component as the default export of the module
 export default DisplayWeather;
