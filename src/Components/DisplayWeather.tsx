@@ -47,15 +47,18 @@ const DisplayWeather = () => {
 
   const [isLoading, setIsLoading] = React.useState(false); // isloading: stores a boolean indicating whether the data is loading
   const [searchCity, setSearchCity] = React.useState(""); //searchCity: stores the search query for the city
+  const [error, setError] = React.useState("");
 
   // fetchCurrentWeather function fetches the current weather data for a given location
   const fetchCurrentWeather = React.useCallback(
+    //useCallback hook is used to memoize the function , so its not recreated on every render
     async (lat: number, lon: number) => {
-      const url = `${api_EndPoint}weather?lat=${lat}&lon=${lon}&appid=${api_Key}&units=metric`;
-      const response = await axios.get(url);
-      return response.data;
-    },
-    [api_EndPoint, api_Key]
+      // async function returns a promise
+      const url = `${api_EndPoint}weather?lat=${lat}&lon=${lon}&appid=${api_Key}&units=metric`; // This line constructs a url by concatenating these
+      const response = await axios.get(url); // Sends s GET request to the constructed URL using axios library
+      return response.data; // Returns the data from the API response
+    }, // Closes the callback hook
+    [api_EndPoint, api_Key] // specify the dependencies, recreated if either of these values change
   );
 
   // fetchWeatherData fetches the weather data for a given city
@@ -64,21 +67,26 @@ const DisplayWeather = () => {
       const url = `${api_EndPoint}weather?q=${city}&appid=${api_Key}&units=metric`;
       const searchResponse = await axios.get(url);
       const currentWeatherData: WeatherDataProps = searchResponse.data;
-      return { currentWeatherData };
+      return { currentWeatherData }; // Returns the extracted weather data
     } catch (error) {
+      // catch block is used to handle any errors that might be thrown ina try block
       throw error;
     }
-  };
+  }; // Closes the fetchWeatherData function
   // handleSearch function handles the search query and updates the state with new weather data
   const handleSearch = async () => {
     if (searchCity.trim() === "") {
+      // checks any whitespace characters and removed
       return;
     }
     try {
       const { currentWeatherData } = await fetchWeatherData(searchCity);
-      setWeatherData(currentWeatherData);
-    } catch (error) {}
-  };
+      setWeatherData(currentWeatherData); // Updates the weatherData state variable passes the currentWeatherData object as an argument
+    } catch (error) {
+      console.error(error);
+      setError("Invalid City");
+    }
+  }; // Closes the handleSearch function definition
 
   // iconChanger returns an icon based on the weather condition
   const iconChanger = (weather: string) => {
@@ -182,6 +190,12 @@ const DisplayWeather = () => {
           </div>
         )}
       </div>
+
+      {error && (
+        <p style={{ color: "red", fontSize: "2rem", fontWeight: "bolder" }}>
+          Invalid city
+        </p>
+      )}
     </MainWrapper>
   );
 };
